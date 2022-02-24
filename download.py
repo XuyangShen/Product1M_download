@@ -12,7 +12,11 @@ def file2url(txt_pth:str, directory:str):
     with open(txt_pth, 'r') as fh:
         for info in tqdm(fh.readlines()):
             info = info.strip().split('#####')
-            id, des, url1, url2, labels = info[0], info[1], info[2], info[3], info[4]
+
+            if len(info) > 4:
+                id, des, url1, url2, labels = info[0], info[1], info[2], info[3], info[4]
+            else:
+                id, des, url1, url2, labels = info[0], info[1], info[2], info[3], None
 
             sub_dir = url1.split('/')[4]
             if len(sub_dir) != 2:
@@ -71,8 +75,11 @@ if __name__ == '__main__':
                 pth, des, labels = rst
                 PATHS.append(pth)
                 CAPTIONS.append(des)
-                LABELS.append(labels)
+                if labels is not None: LABELS.append(labels) 
     
         # save meta data
-        df = pd.DataFrame({'path': PATHS, 'captions': CAPTIONS, 'labels': LABELS})
+        if len(LABELS) > 0:
+            df = pd.DataFrame({'path': PATHS, 'captions': CAPTIONS, 'labels': LABELS})
+        else:
+            df = pd.DataFrame({'path': PATHS, 'captions': CAPTIONS})
         df.to_csv(f'meta/{name}.csv', index=None)
